@@ -8,7 +8,7 @@ class BrainFuck
     private $pointer = 0;
     private $instructions = array();
     private $instructionPointer = 0;
-    private $debug = true;
+    private $debug = false;
 
     public function setInput($input)
     {
@@ -18,7 +18,7 @@ class BrainFuck
     public function run($instructions)
     {
         $this->instructions = str_split($instructions);
-        $instruction = $this->getNextInstruction();
+        $instruction = $this->getNextInstruction(0);
         while ($instruction) {
             switch ($instruction) {
                 case ',':
@@ -66,9 +66,7 @@ class BrainFuck
     private function readInput()
     {
         $inputChar = array_shift($this->input);
-        if ($inputChar) {
-            $this->register[$this->pointer] = ord($inputChar);
-        }
+        $this->register[$this->pointer] = ord($inputChar);
     }
 
     private function writeOutput()
@@ -83,7 +81,7 @@ class BrainFuck
         if ($this->pointer < 0) {
             $this->pointer = 0;
         }
-        if (!$this->register[$this->pointer]) {
+        if (!isset($this->register[$this->pointer])) {
             $this->register[$this->pointer] = 0;
         }
     }
@@ -101,15 +99,14 @@ class BrainFuck
     private function startLoop()
     {
         if ($this->register[$this->pointer] == 0) {
-            $instruction = $this->getNextInstruction();
             $loopLevel = 1;
             while ($loopLevel > 0) {
+                $instruction = $this->getNextInstruction();
                 if ($instruction == '[') {
                     $loopLevel++;
                 } elseif ($instruction == ']') {
                     $loopLevel--;
                 }
-                $instruction = $this->getNextInstruction();
             }
         }
     }
@@ -117,15 +114,14 @@ class BrainFuck
     private function endLoop()
     {
         if ($this->register[$this->pointer] != 0) {
-            $instruction = $this->getNextInstruction(-1);
             $loopLevel = 1;
             while ($loopLevel > 0) {
+                $instruction = $this->getNextInstruction(-1);
                 if ($instruction == ']') {
                     $loopLevel++;
                 } elseif ($instruction == '[') {
                     $loopLevel--;
                 }
-                $instruction = $this->getNextInstruction(-1);
             }
         }
     }
